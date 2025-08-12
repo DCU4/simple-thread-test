@@ -3,6 +3,8 @@ from datetime import date
 def calculate_reimbursement(projects):
     reimbursements = []
     # TODO: multiple projects
+    projects = check_overlapping_projects(projects)
+
     for project in projects: 
         total = 0
         # calculate...
@@ -16,6 +18,25 @@ def calculate_reimbursement(projects):
     print(sum(reimbursements))
     return sum(reimbursements)
 
+
+def check_overlapping_projects(projects): 
+    end_date_check = ""
+    i = 0
+    for project in projects:
+        t_days = get_travel_days(project["start_date"], project["end_date"])
+        if t_days == 2: # not single days of travel
+            if project["start_date"] == end_date_check:
+                # combine projects into one ?
+                projects[i-1]['end_date'] = project['end_date']
+                # project['start_date']
+                # get rid of current project dict
+                projects.pop(i)
+                
+            end_date_check = project['end_date']
+    i += 1
+    return projects
+
+    
 
 def get_full_days(start_date, end_date):
     m,d,y = start_date.split('/')
@@ -90,6 +111,11 @@ projects = [{
 }]
 calculate_reimbursement(projects)
 
+# 45
+# 55 + 45 + (3*75) + (3*85)
+# 580
+
+# wrong
 # 45
 # 110 + 3*85 (255) = 365
 # 90 + 2*75 = 240
