@@ -34,8 +34,8 @@ def get_full_days(start_date, end_date):
 
 def get_travel_days(start_date, end_date):
     m,d,y = start_date.split('/')
-    m,d,y = end_date.split('/')
     start = date(int(y), int(m), int(d))
+    m,d,y = end_date.split('/')
     end = date(int(y), int(m), int(d))
     if start == end:
         return 1
