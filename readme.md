@@ -46,5 +46,4 @@ set of projects contains n (type of day) in (type of city) * (type of city rate)
 
 2 travel days at low cost city rate + 1 full day at low cost city rate
 
-[(l:(t,f),h:(t,f),l:(t,f))]
 
