@@ -2,19 +2,17 @@ from datetime import date
 
 def calculate_reimbursement(projects):
     reimbursements = []
-    # TODO: multiple projects
     projects = check_overlapping_projects(projects)
-
+    print(projects)
     for project in projects: 
         total = 0
-        # calculate...
-        f_days = get_full_days(project["start_date"], project["end_date"])
-        t_days = get_travel_days(project["start_date"], project["end_date"])
+        f_days = get_full_days(project["start_date"], project["end_date"], project["is_sequence"], project["is_end_sequence"])
+        t_days = get_travel_days(project["start_date"], project["end_date"], project["is_sequence"])
         city_rates = get_city_rates(project["city"]) # H or L
-        print(f_days, t_days, city_rates)
-        # is this the best way? no
+        print(f_days, city_rates["full"], t_days, city_rates["travel"])
         total = (f_days * city_rates["full"]) + (t_days * city_rates["travel"])
         reimbursements.append(total)
+    print(reimbursements)
     print(sum(reimbursements))
     return sum(reimbursements)
 
@@ -23,43 +21,54 @@ def check_overlapping_projects(projects):
     end_date_check = ""
     i = 0
     for project in projects:
-        t_days = get_travel_days(project["start_date"], project["end_date"])
+        t_days = get_travel_days(project["start_date"], project["end_date"], "false")
+        previous_project = projects[i-1]
+        project["is_end_sequence"] = "false"
+
         if t_days == 2: # not single days of travel
             if project["start_date"] == end_date_check:
-                # combine projects into one ?
-                projects[i-1]['end_date'] = project['end_date']
-                # project['start_date']
-                # get rid of current project dict
-                projects.pop(i)
-                
-            end_date_check = project['end_date']
-    i += 1
+                overlapping_project = project
+                previous_project["is_sequence"] = "true"
+                overlapping_project["is_sequence"] = "true"
+                overlapping_project["is_end_sequence"] = "true"
+                end_date_check = ""
+            else:
+                previous_project = projects[i-1]
+                previous_project["is_sequence"] = "false"
+        else :
+            previous_project["is_sequence"] = "false"
+    
+        end_date_check = project['end_date']
+        i += 1
     return projects
 
     
 
-def get_full_days(start_date, end_date):
-    m,d,y = start_date.split('/')
+def get_full_days(start_date, end_date, is_sequence, is_end_sequence):
+    m,d,y = start_date.split("/")
     start = date(int(y), int(m), int(d))
-    m,d,y = end_date.split('/')
+    m,d,y = end_date.split("/")
     end = date(int(y), int(m), int(d))
-    # print(start, end)
     delta = (end - start)
-    # print(delta)
+
     # delta = difference between days, so subtract 1 for other travel day
-    full_days = delta.days - 1
+    # if sequence then include that day except end sequence
+    full_days = delta.days if is_sequence == "true" and is_end_sequence == "true" else delta.days - 1
+  
     if full_days >= 1:
         return full_days
     else:
         return 0
 
 
-def get_travel_days(start_date, end_date):
-    m,d,y = start_date.split('/')
+def get_travel_days(start_date, end_date, is_sequence):
+    m,d,y = start_date.split("/")
     start = date(int(y), int(m), int(d))
-    m,d,y = end_date.split('/')
+    m,d,y = end_date.split("/")
     end = date(int(y), int(m), int(d))
-    if start == end:
+    if is_sequence == "true":
+        return 1
+    elif start == end:
         return 1
     else: 
         return 2
@@ -85,13 +94,15 @@ projects = [{
     "end_date": "10/4/2024",
     "city": "L"
 }]
-calculate_reimbursement(projects)
+# calculate_reimbursement(projects)
 
 
 
-# TODO: 
 # Projects that are contiguous or overlap, with no gap between the end of one and the start of the next, 
 # are considered a sequence of projects and should be treated similar to a single project.
+
+# remove last day from previous project in sequence
+# use all days as full except last for ending project 
 
 # hmm so 10/6 is a full day, but which rate? split in half? lets do start date rate
 projects = [{
@@ -113,7 +124,7 @@ calculate_reimbursement(projects)
 
 # 45
 # 55 + 45 + (3*75) + (3*85)
-# 580
+# 625
 
 # wrong
 # 45
