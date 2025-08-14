@@ -119,15 +119,19 @@ def set_travel_sequence(projects):
 
     projects = list(map(set_default_travel_sequence, projects))
 
-    find_first = lambda p: p["is_sequence"] == True
-    first_seq = next(filter(find_first, projects), False) # first is_sequence
-    if first_seq is not False:
-        first_seq["is_travel_sequence"] = True
-
-    reversed_set = reversed(projects)
-    last_seq = next(filter(find_first, reversed_set), False) # last is_sequence
-    if last_seq is not False:
-        last_seq["is_travel_sequence"] = True
+    # mark projects as travel sequence if their dates are contiguous or overlapping
+    for i in range(1, len(projects)):
+      prev_end = parse_date(projects[i-1]["end_date"])
+      curr_start = parse_date(projects[i]["start_date"])
+      if (curr_start - prev_end).days <= 1:
+        # only set is_travel_sequence if neither previous nor current is already marked
+        if not projects[i-1]["is_travel_sequence"] and not projects[i]["is_travel_sequence"]:
+            projects[i]["is_travel_sequence"] = True
+            projects[i-1]["is_travel_sequence"] = True
+      if (projects[i]["start_date"] == projects[i-1]["start_date"] and 
+          projects[i]["end_date"] == projects[i-1]["end_date"]):
+        projects[i]["is_travel_sequence"] = False
+        projects[i-1]["is_travel_sequence"] = False
 
     return projects
 
@@ -153,7 +157,19 @@ def get_city_rates(city) :
 # Set 1
 projects = [{
     "start_date": "10/1/24",
-    "end_date": "10/4/24",
+    "end_date": "10/3/24",
+    "city": "L"
+},{
+    "start_date": "10/2/24",
+    "end_date": "10/5/24",
+    "city": "L"
+},{
+    "start_date": "10/7/24",
+    "end_date": "10/8/24",
+    "city": "L"
+},{
+    "start_date": "10/8/24",
+    "end_date": "10/10/24",
     "city": "L"
 }
 ]
