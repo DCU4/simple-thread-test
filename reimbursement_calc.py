@@ -40,7 +40,7 @@ def check_overlapping_projects(projects):
         # check_contigious = 0
         # if previous_project is not None:
         check_contigious = parse_date(project["start_date"]) - parse_date(previous_project["end_date"])
-        print('check_contigious.days', check_contigious.days)
+
         if(check_contigious.days < 0) :
             previous_project["is_sequence"] = True
             previous_project["is_overlapping"] = True
@@ -61,8 +61,6 @@ def check_overlapping_projects(projects):
         i += 1
     return projects
             
-
-    
 
 
 def get_full_days(project):
@@ -152,6 +150,7 @@ def get_city_rates(city) :
     return city_rates[city]
 
 
+# Set 1
 projects = [{
     "start_date": "10/1/24",
     "end_date": "10/4/24",
@@ -165,7 +164,7 @@ calculate_reimbursement(projects)
 # Projects that are contiguous or overlap, with no gap between the end of one and the start of the next, 
 # are considered a sequence of projects and should be treated similar to a single project.
 
-
+# Set 2
 projects = [{
     "start_date": "10/1/24",
     "end_date": "10/1/24",
@@ -183,7 +182,7 @@ projects = [{
 }]
 calculate_reimbursement(projects)
 
-
+# Set 3
 projects = [{
     "start_date": "9/30/24",
     "end_date": "10/3/24",
@@ -201,9 +200,9 @@ projects = [{
 }]
 calculate_reimbursement(projects)
 
-
-
 # Any given day is only ever reimbursed once, even if multiple projects are on the same day.
+
+# Set 4
 projects = [{
     "start_date": "10/1/24",
     "end_date": "10/1/24",
