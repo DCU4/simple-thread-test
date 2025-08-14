@@ -48,7 +48,8 @@ def check_overlapping_projects(projects):
             project["is_overlapping"] = True
             overlapping_days = parse_date(previous_project["end_date"]) - parse_date(previous_project["start_date"])
             project["overlapping_days"] = overlapping_days.days + 1
-            previous_project["overlapping_days"] = 0
+            if "overlapping_days" not in previous_project: 
+                previous_project["overlapping_days"] = 0
 
         elif (check_contigious.days == 1 or check_contigious.days == 0):
             previous_project["is_sequence"] = True
@@ -79,7 +80,8 @@ def get_full_days(project):
         # if sequence day AND overlapping, return all days from previous
         if project["is_overlapping"] == True:
             if project["overlapping_days"] > 0: 
-                return delta.days - project["overlapping_days"]
+                diff_days = delta.days - project["overlapping_days"]
+                return diff_days if diff_days > 0 else 0
             else :
                 return delta.days + 1 if delta.days == 1 else delta.days
 
@@ -154,12 +156,8 @@ projects = [{
     "start_date": "10/1/24",
     "end_date": "10/4/24",
     "city": "L"
-},
-{
-    "start_date": "10/1/24",
-    "end_date": "10/10/24",
-    "city": "L"
-}]
+}
+]
 calculate_reimbursement(projects)
 
 
